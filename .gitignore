@@ -7,3 +7,5 @@
 /.vs
 /Firechat/.vs/Firechat
 /Firechat/packages
+/Firechat/Firechat/App_Data/aspnet-Firechat-20191226045105_log.ldf
+/Firechat/Firechat/App_Data/aspnet-Firechat-20191226045105.mdf

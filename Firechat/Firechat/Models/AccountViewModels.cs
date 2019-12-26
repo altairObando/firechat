@@ -3,6 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Firechat.Models
 {
+    public class Contacto
+    {
+        public string UserName { get; set; }
+        
+    }
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
@@ -64,6 +69,11 @@ namespace Firechat.Models
 
     public class RegisterViewModel
     {
+        [Required]
+        [Display(Name ="Nombre de usuario")]
+        [StringLength(100, ErrorMessage = "El número de caracteres de {0} debe ser al menos {2}.",
+            MinimumLength = 3)]
+        public string UserName { get; set; }
         [Required]
         [EmailAddress]
         [Display(Name = "Correo electrónico")]

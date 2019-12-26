@@ -1,4 +1,6 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -16,6 +18,11 @@ namespace Firechat.Models
             // Agregar aquí notificaciones personalizadas de usuario
             return userIdentity;
         }
+        public virtual List<Participacion> Participaciones { get; set; }
+        public virtual List<Conversacion> Conversaciones { get; set; }
+        public virtual List<ConversacionEliminada> ConversacionesBorradas { get; set; }
+        public virtual List<Mensaje> Mensajes { get; set; }
+        public virtual List<MensajeEliminado> MensajesEliminados { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -29,5 +36,16 @@ namespace Firechat.Models
         {
             return new ApplicationDbContext();
         }
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        }
+        // Registrando entidades.
+        public DbSet<Participacion> participaciones { get; set; }
+        public DbSet<Conversacion> Conversaciones { get; set; }
+        public DbSet<Mensaje> Mensajes { get; set; }
+        public DbSet<ConversacionEliminada> ConversacionesEliminadas { get; set; }
+        public DbSet<MensajeEliminado> MensajesEliminados { get; set; }
     }
 }
