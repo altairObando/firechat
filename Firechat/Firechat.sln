@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firechat", "Firechat\Firechat.csproj", "{0D5F3035-E680-4ED0-AE00-7A87F2681DFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D5F3035-E680-4ED0-AE00-7A87F2681DFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5F3035-E680-4ED0-AE00-7A87F2681DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5F3035-E680-4ED0-AE00-7A87F2681DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5F3035-E680-4ED0-AE00-7A87F2681DFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {92F34B9A-8E0F-4CF8-AF2E-E4BED9168256}
+	EndGlobalSection
+EndGlobal

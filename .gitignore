@@ -3,3 +3,7 @@
 ################################################################################
 
 /Firechat/Firechat/bin
+/Firechat/Firechat/obj/Debug
+/.vs
+/Firechat/.vs/Firechat
+/Firechat/packages
