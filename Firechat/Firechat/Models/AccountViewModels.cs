@@ -1,12 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 namespace Firechat.Models
 {
     public class Contacto
     {
         public string UserName { get; set; }
-        
+        public string Email { get; set; }
+        public string  Imagen { get; set; }
+    }
+    public class ActualizarImagenViewModel
+    {
+        [Display(Name ="Imagen del perfil")]
+        [Required(ErrorMessage ="Debe seleccionar una imagen")]
+        public HttpPostedFileBase Imagen { get; set; }
     }
     public class ExternalLoginConfirmationViewModel
     {
@@ -54,9 +62,8 @@ namespace Firechat.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Correo electrónico")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "Usuario")]
+        public string Username { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

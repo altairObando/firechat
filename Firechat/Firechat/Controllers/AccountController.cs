@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Firechat.Models;
+using System.IO;
 
 namespace Firechat.Controllers
 {
@@ -75,7 +76,7 @@ namespace Firechat.Controllers
 
             // No cuenta los errores de inicio de sesión para el bloqueo de la cuenta
             // Para permitir que los errores de contraseña desencadenen el bloqueo de la cuenta, cambie a shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -170,6 +171,50 @@ namespace Firechat.Controllers
 
             // Si llegamos a este punto, es que se ha producido un error y volvemos a mostrar el formulario
             return View(model);
+        }
+
+        public ActionResult Actualizar()
+        {
+            // Buscar la imagen actual.
+            ViewBag.Imagen = UserManager.FindByName(User.Identity.Name).ImagenUrl;
+            return View();
+        }
+        [HttpPost]
+        public async Task<ActionResult> Actualizar(ActualizarImagenViewModel model)
+        {
+            
+            if(ModelState.IsValid)
+            {
+               if(model.Imagen != null && model.Imagen.ContentLength > 0)
+                {
+                    var date = DateTime.Now.ToString("ddMMyyyyhhmmss"); //se deberia de enumerar cada archivo del dia aunque tenga los mismos segundos uwu
+                    // Extraer el nombre del archivo
+                    var fileName = date +"-"+Path.GetFileName(model.Imagen.FileName);
+                    // almacenar en una ruta fisica del servidor
+                    var path = Path.Combine(Server.MapPath("~/Content/Profiles"), fileName);
+                    // ruta para mostrar en el servidor.
+                    var virtualPath = "/Content/Profiles/" + fileName;
+                    model.Imagen.SaveAs(path);
+                    // Actualizar la imagen del usuario.
+                    var username = User.Identity.Name;
+                    var user = await UserManager.FindByNameAsync(username);
+                    //  borrar la imagen actual.
+                    if(!string.IsNullOrEmpty(user.ImagenUrl))
+                    {
+                        var oldPath = Path.Combine(Server.MapPath( "~" + user.ImagenUrl));
+                        if (System.IO.File.Exists(oldPath))
+                        {
+                            // Borrar 
+                            System.IO.File.Delete(oldPath);
+                        }
+                    }
+                    user.ImagenUrl = virtualPath;
+                    var result  = await UserManager.UpdateAsync(user);
+                    
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            return View();
         }
 
         //

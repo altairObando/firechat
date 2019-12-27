@@ -32,8 +32,12 @@ namespace Firechat.Hubs
 
         public async Task<List<Contacto>> GetContactosAsync()
         {
-            var data = await db.Users.ToListAsync();
-            return data.Select(x => new Contacto { UserName = x.UserName }).ToList();
+            var data = await db.Users.OrderBy(x => x.UserName).ToListAsync();
+            return data.Select(x => new Contacto { 
+                UserName = x.UserName,
+                Email = x.Email,
+                Imagen = x.ImagenUrl
+            }).ToList();
         }
     }
     
