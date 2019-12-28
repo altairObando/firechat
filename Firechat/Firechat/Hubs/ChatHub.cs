@@ -22,6 +22,12 @@ namespace Firechat.Hubs
         {
             return await _chatProxy.GetContactosAsync();
         }
+
+        public async Task<Conversacion> GetConversaciones(string participante)
+        {
+            string user = Context.User.Identity.Name;
+            return await _chatProxy.GetConversacionesAsync(user, participante);
+        }
     }
 
 
