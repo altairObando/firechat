@@ -30,9 +30,9 @@ namespace Firechat.Hubs
             }
         }
 
-        public async Task<List<Contacto>> GetContactosAsync()
+        public async Task<List<Contacto>> GetContactosAsync(string distinct)
         {
-            var data = await db.Users.OrderBy(x => x.UserName).ToListAsync();
+            var data = await db.Users.Where(d => d.UserName != distinct).OrderBy(x => x.UserName).ToListAsync();
             return data.Select(x => new Contacto { 
                 UserName = x.UserName,
                 Email = x.Email,
@@ -42,22 +42,22 @@ namespace Firechat.Hubs
 
         public async Task<Conversacion> GetConversacionesAsync(string usuario, string correoParticipante)
         {
+            Conversacion conversacion = null;
             // Usuario 
             var user = await db.Users.FirstOrDefaultAsync(x => x.UserName == usuario);
             // Participante  
             var partic = await db.Users.FirstOrDefaultAsync(x => x.Email == correoParticipante);
-            // Buscar la conversacion.
-            var conversacion = await db.Conversaciones
-                .Where(
-                x =>
-                // Si es el creador de la conversacion
-                (x.ApplicationUserId == user.Id &&
-                x.Participantes.Count(y => y.ApplicationUserId == partic.Id) > 0) ||
-                // o si es participante
-                (x.ApplicationUserId == user.Id &&
-                x.Participantes.Count(y => y.ApplicationUserId == partic.Id) > 0)
+            // Participaciones 
+            var valor1 = await db.participaciones
+                .Where(y => 
+                (y.ApplicationUserId == partic.Id && y.Conversacion.ApplicationUserId == user.Id) ||
+                (y.ApplicationUserId == user.Id && y.Conversacion.ApplicationUserId == partic.Id))
 
-                ).FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
+            if(valor1 != null)
+            {
+                conversacion = valor1.Conversacion;
+            }
             // Si no hay conversaciones crear una nueva 
             if(conversacion == null)
             {
@@ -93,7 +93,46 @@ namespace Firechat.Hubs
                     }
                 }
             }
-            return conversacion;
+
+            return new Conversacion
+            {
+                Id =  conversacion.Id,
+                Mensajes = conversacion.Mensajes.Select(
+                    x => new Mensaje {
+                    ApplicationUser = new ApplicationUser { 
+                        UserName = x.ApplicationUser.UserName,
+                        ImagenUrl = x.ApplicationUser.ImagenUrl
+                    },
+                    Contenido = x.Contenido,
+                    FechaEnvio = x.FechaEnvio
+                }).ToList()
+            };
+        }
+
+        public async Task EnviarMensaje(string usuario, int idConversacion, string mensaje)
+        {
+            // Buscar el id del enviador 
+            var user = db.Users.FirstOrDefault(x => x.UserName == usuario);
+            var destino = db.Conversaciones.Find(idConversacion);
+            var msg = new Mensaje
+            {
+                FechaEnvio = DateTime.Now,
+                ConversacionId = destino.Id,
+                Contenido = mensaje,
+                ApplicationUserId = user.Id
+            };
+            db.Mensajes.Add(msg);
+            var data = await db.SaveChangesAsync() > 0;
+            if(data)
+            {
+
+                var cliente = destino.Participantes[0].ApplicationUser.UserName;
+
+                if(cliente != user.UserName)
+                    Clientes.User(cliente).NotificarMensaje(mensaje, user.UserName);
+                else
+                    Clientes.User(user.UserName).NotificarMensaje(mensaje, cliente);
+            }
         }
     }
     

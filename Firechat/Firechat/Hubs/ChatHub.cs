@@ -20,7 +20,8 @@ namespace Firechat.Hubs
         public ChatHub() : this(ChatProxy.Instancia) { }
         public async Task<List<Contacto>> GetContactos ()
         {
-            return await _chatProxy.GetContactosAsync();
+            string user = Context.User.Identity.Name;
+            return await _chatProxy.GetContactosAsync(user);
         }
 
         public async Task<Conversacion> GetConversaciones(string participante)
@@ -28,7 +29,18 @@ namespace Firechat.Hubs
             string user = Context.User.Identity.Name;
             return await _chatProxy.GetConversacionesAsync(user, participante);
         }
+
+        public async Task EnviarMensaje(int idConversacion, string mensaje)
+        {
+            string user = Context.User.Identity.Name;
+            await _chatProxy.EnviarMensaje(user, idConversacion, mensaje);
+            
+        }
+
+
+
     }
+
 
 
     public class UserProvider : IUserIdProvider
