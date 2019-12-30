@@ -32,12 +32,29 @@ namespace Firechat.Hubs
 
         public async Task<List<Contacto>> GetContactosAsync(string distinct)
         {
-            var data = await db.Users.Where(d => d.UserName != distinct).OrderBy(x => x.UserName).ToListAsync();
-            return data.Select(x => new Contacto { 
-                UserName = x.UserName,
-                Email = x.Email,
-                Imagen = x.ImagenUrl
-            }).ToList();
+            try
+            {
+                var data = await db.Users.Where(d => d.UserName != distinct).OrderBy(x => x.UserName).ToListAsync();
+                var valor =  data.Select(x => new Contacto
+                {
+                    UserName = x.UserName,
+                    Email = x.Email,
+                    Imagen = x.ImagenUrl,
+                    UltimoMensaje = x.Conversaciones.Where(y =>
+                       y.ApplicationUserId == x.Id ||
+                       y.Participantes.ElementAt(0).ApplicationUserId == x.Id
+                    ).FirstOrDefault() != null ? x.Conversaciones.Where(y =>
+                        y.ApplicationUserId == x.Id ||
+                        y.Participantes.ElementAt(0).ApplicationUserId == x.Id
+                    ).FirstOrDefault().UltimoMensaje : "Nueva Conversación"
+                }).ToList();
+                return valor;
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+                return new List<Contacto>();
+            }
         }
 
         public async Task<Conversacion> GetConversacionesAsync(string usuario, string correoParticipante)
@@ -122,16 +139,23 @@ namespace Firechat.Hubs
                 ApplicationUserId = user.Id
             };
             db.Mensajes.Add(msg);
-            var data = await db.SaveChangesAsync() > 0;
-            if(data)
+            try
             {
+                var data = await db.SaveChangesAsync() > 0;
+                if (data)
+                {
+                    var cliente = destino.ApplicationUserId != user.Id
+                                ? destino.ApplicationUser.UserName
+                                : destino.Participantes.ElementAt(0).ApplicationUser.UserName;
 
-                var cliente = destino.Participantes[0].ApplicationUser.UserName;
-
-                if(cliente != user.UserName)
-                    Clientes.User(cliente).NotificarMensaje(mensaje, user.UserName);
-                else
-                    Clientes.User(user.UserName).NotificarMensaje(mensaje, cliente);
+                    Clientes.User(cliente).NotificarMensaje(mensaje, user.UserName, user.ImagenUrl);
+                }
+            }catch(Exception e)
+            {
+                var cliente = destino.ApplicationUserId != user.Id
+                                    ? destino.ApplicationUser.UserName
+                                    : destino.Participantes.ElementAt(0).ApplicationUser.UserName;
+                Clientes.User(cliente).ErrorAlEnviarMensaje(e.Message);
             }
         }
     }

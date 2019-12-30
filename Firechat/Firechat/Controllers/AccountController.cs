@@ -187,7 +187,7 @@ namespace Firechat.Controllers
             {
                if(model.Imagen != null && model.Imagen.ContentLength > 0)
                 {
-                    var date = DateTime.Now.ToString("ddMMyyyyhhmmss"); //se deberia de enumerar cada archivo del dia aunque tenga los mismos segundos uwu
+                    var date = DateTime.Now.ToString("ddMMyyyyhhmm"); //se deberia de enumerar cada archivo del dia aunque tenga los mismos segundos uwu
                     // Extraer el nombre del archivo
                     var fileName = date +"-"+Path.GetFileName(model.Imagen.FileName);
                     // almacenar en una ruta fisica del servidor

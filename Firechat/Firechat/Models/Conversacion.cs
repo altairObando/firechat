@@ -17,6 +17,20 @@ namespace Firechat.Models
         public virtual List<Participacion> Participantes { get; set; }
         public virtual List<Mensaje> Mensajes { get; set; }
         public virtual List<ConversacionEliminada> ConversacionesBorradas { get; set; }
+        public string UltimoMensaje { 
+            get { 
+                if(Mensajes.Count > 0)
+                {
+                    // Ordenar los mensajes de forma descendente y seleccionar el ultimo
+                    return Mensajes.OrderByDescending(x => x.Id).FirstOrDefault().Contenido;
+                }
+                else
+                {
+                    return "Nueva Conversación";
+                }
+            }
+        }
+
         public Conversacion()
         {
             Participantes = new List<Participacion>();

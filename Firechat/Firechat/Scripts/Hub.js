@@ -5,8 +5,27 @@ const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
 var proxy = $.connection.chatHub;
-proxy.client.notificarMensaje = function (mensaje, usuario) {
+proxy.client.notificarMensaje = function (mensaje, usuario, ImagenUrl) {
     $("#" + usuario).find("p").html(mensaje);
+    if ($("#" + usuario).hasClass('active_chat')) {
+        var fRaw = new Date();
+        var fecha = formatAMPM(fRaw);
+
+        var msg = "";
+        msg += '<div class="incoming_msg">';
+        msg += '<div class="incoming_msg_img">';
+        msg += '<img src="' + ImagenUrl + '" alt="avatar-' + usuario + '"> </div>'
+        msg += '<div class="received_msg">';
+        msg += '<div class="received_withd_msg">';
+        msg += '<p>' + mensaje + '</p>';
+        msg += '<span class="time_date"> ' + fecha + '  |    ' + monthNames[fRaw.getMonth()] + ' ' + fRaw.getDate() + '</span>';
+        msg += '</div>';
+        msg += '</div>';
+        msg += '</div>';
+        $(".msg_history").append(msg);
+        var d = $('.msg_history');
+        d.scrollTop(d.prop("scrollHeight"));
+    }
     
 }
 $.connection.hub.start().done(function () {
@@ -72,7 +91,7 @@ function getConversacion(email) {
                 var msg = "";
                 msg += '<div class="incoming_msg">';
                 msg += '<div class="incoming_msg_img">';
-                msg += '<img src="' + value.ApplicationUser.ImagenUrl + '" alt="avatar-' + value.ApplicationUser.UserName + '"> </div>'
+                msg += '<img src="' + value.ApplicationUser.ImagenUrl + '" alt="avatar"> </div>'
                 msg += '<div class="received_msg">';
                 msg += '<div class="received_withd_msg">';
                 msg += '<p>' + value.Contenido + '</p>';
@@ -103,7 +122,7 @@ function fillChatBox(data, tipo) {
             obj += '<div class="chat_ib">';
             obj += '<h5>' + value.Email +' <span class="chat_date">';
             obj += '<button type="button" class="btn btn-primary btn-sm" onclick=getConversacion("'+value.Email+'")>Chat <i class="fa fa-comment"></i></button>';
-            obj += '</span></h5><p></p>';
+            obj += '</span></h5><p>' + value.UltimoMensaje+'</p>';
             obj += '</div>';
             obj += '</div>';
             obj += '</div>';

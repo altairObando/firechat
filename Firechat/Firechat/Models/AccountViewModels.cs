@@ -9,6 +9,7 @@ namespace Firechat.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public string  Imagen { get; set; }
+        public string  UltimoMensaje { get; set; }
     }
     public class ActualizarImagenViewModel
     {
